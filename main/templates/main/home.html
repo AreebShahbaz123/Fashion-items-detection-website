@@ -1,0 +1,189 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Fashion Vision - Home{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-purple: #a259ff;
+        --dark-purple: #3d0066;
+        --light-purple: #e0cfff;
+        --black: #181818;
+        --white: #ffffff;
+    }
+
+    .hero-section {
+        background: linear-gradient(120deg, var(--primary-purple) 60%, var(--dark-purple) 100%), url('https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1350&q=80');
+        background-size: cover;
+        background-position: center;
+        color: var(--white);
+        padding: 100px 0;
+        margin-bottom: 50px;
+        border-radius: 0 0 30px 30px;
+        box-shadow: 0 8px 32px rgba(162,89,255,0.12);
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 900;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 8px rgba(162,89,255,0.2);
+        letter-spacing: 2px;
+    }
+
+    .hero-subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 30px;
+        opacity: 0.9;
+        font-weight: 500;
+    }
+
+    .feature-card {
+        border: none;
+        border-radius: 18px;
+        transition: transform 0.3s ease;
+        background: var(--black);
+        box-shadow: 0 4px 16px rgba(162,89,255,0.08);
+        color: var(--white);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px) scale(1.03);
+        box-shadow: 0 8px 32px rgba(162,89,255,0.18);
+    }
+
+    .feature-icon {
+        font-size: 2.5rem;
+        color: var(--primary-purple);
+        margin-bottom: 20px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(90deg, var(--primary-purple) 0%, var(--dark-purple) 100%);
+        border: none;
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(90deg, var(--dark-purple) 0%, var(--primary-purple) 100%);
+        color: var(--white);
+        transform: scale(1.05);
+    }
+
+    .stats-section {
+        background: var(--light-purple);
+        padding: 50px 0;
+        margin: 50px 0;
+        border-radius: 20px;
+        color: var(--dark-purple);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: var(--primary-purple);
+    }
+
+    .stat-label {
+        color: var(--dark-purple);
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-center">
+    <div class="container">
+        <h1 class="hero-title">Fashion Vision</h1>
+        <p class="hero-subtitle">AI-Powered Fashion Recognition for Trendsetters</p>
+        <a href="{% url 'main:upload' %}" class="btn btn-primary btn-lg">Try Fashion AI</a>
+    </div>
+</section>
+
+<!-- Features Section -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <div class="feature-icon">👜</div>
+                    <h5 class="card-title">Snap & Upload</h5>
+                    <p class="card-text">Upload a photo of your outfit or accessory and let our AI analyze your style instantly.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <div class="feature-icon">🤖</div>
+                    <h5 class="card-title">AI Trend Analysis</h5>
+                    <p class="card-text">Our advanced model identifies fashion items and suggests trending looks.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <div class="feature-icon">✨</div>
+                    <h5 class="card-title">Personalized Guide</h5>
+                    <p class="card-text">Get style tips and recommendations tailored to your unique fashion sense.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="stat-number">99%</div>
+                <div class="stat-label">Trend Accuracy</div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-number">50k+</div>
+                <div class="stat-label">Looks Analyzed</div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-number">10</div>
+                <div class="stat-label">Fashion Categories</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<div class="container mb-5">
+    <h2 class="text-center mb-4">How It Works</h2>
+    <div class="row">
+        <div class="col-md-3 text-center">
+            <div class="feature-icon">1️⃣</div>
+            <h5>Upload</h5>
+            <p>Snap or upload a fashion photo</p>
+        </div>
+        <div class="col-md-3 text-center">
+            <div class="feature-icon">2️⃣</div>
+            <h5>Analyze</h5>
+            <p>AI analyzes your style</p>
+        </div>
+        <div class="col-md-3 text-center">
+            <div class="feature-icon">3️⃣</div>
+            <h5>Classify</h5>
+            <p>Get fashion category</p>
+        </div>
+        <div class="col-md-3 text-center">
+            <div class="feature-icon">4️⃣</div>
+            <h5>Inspire</h5>
+            <p>Receive style inspiration</p>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,281 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Upload Image - Fashion Vision{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-purple: #a259ff;
+        --dark-purple: #3d0066;
+        --light-purple: #e0cfff;
+        --black: #181818;
+        --white: #ffffff;
+    }
+
+    .upload-section {
+        background: linear-gradient(120deg, var(--primary-purple) 60%, var(--dark-purple) 100%), url('https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1350&q=80');
+        background-size: cover;
+        background-position: center;
+        color: var(--white);
+        padding: 60px 0;
+        margin-bottom: 50px;
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(162,89,255,0.12);
+    }
+
+    .upload-container {
+        background-color: var(--black);
+        border-radius: 18px;
+        padding: 30px;
+        box-shadow: 0 4px 16px rgba(162,89,255,0.08);
+        margin-top: 30px;
+        color: var(--white);
+    }
+
+    .upload-area {
+        border: 2px dashed var(--primary-purple);
+        border-radius: 10px;
+        padding: 40px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: var(--black);
+    }
+
+    .upload-area:hover {
+        background-color: var(--light-purple);
+        color: var(--dark-purple);
+    }
+
+    .upload-icon {
+        font-size: 3rem;
+        color: var(--primary-purple);
+        margin-bottom: 20px;
+    }
+
+    .upload-text {
+        color: var(--primary-purple);
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .btn-upload {
+        background: linear-gradient(90deg, var(--primary-purple) 0%, var(--dark-purple) 100%);
+        border: none;
+        color: var(--white);
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+
+    .btn-upload:hover {
+        background: linear-gradient(90deg, var(--dark-purple) 0%, var(--primary-purple) 100%);
+        color: var(--white);
+        transform: scale(1.05);
+    }
+
+    .preview-image {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 10px;
+        margin-top: 20px;
+        display: none;
+        box-shadow: 0 2px 8px rgba(162,89,255,0.12);
+    }
+
+    #file-input {
+        display: none;
+    }
+
+    .result-container {
+        display: none;
+        margin-top: 30px;
+        padding: 20px;
+        border-radius: 10px;
+        background-color: var(--light-purple);
+        color: var(--dark-purple);
+    }
+
+    .result-title {
+        color: var(--primary-purple);
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+
+    .result-text {
+        color: var(--dark-purple);
+        font-size: 1.2rem;
+    }
+
+    .loading {
+        display: none;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid var(--light-purple);
+        border-top: 5px solid var(--primary-purple);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Upload Section -->
+<section class="upload-section text-center">
+    <div class="container">
+        <h1 class="display-4 mb-4">Upload Your Fashion Photo</h1>
+        <p class="lead">Upload an outfit or accessory image to get instant style analysis</p>
+    </div>
+</section>
+
+<!-- Upload Container -->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="upload-container">
+                <form id="upload-form" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="upload-area" id="drop-area">
+                        <div class="upload-icon">👜</div>
+                        <h3 class="upload-text">Drag & Drop your fashion photo here</h3>
+                        <p class="text-muted">or</p>
+                        <input type="file" id="file-input" name="image" accept="image/*" onchange="previewImage(this)">
+                        <button type="button" class="btn btn-upload" onclick="document.getElementById('file-input').click()">
+                            Choose File
+                        </button>
+                    </div>
+                    <img id="preview" class="preview-image" src="#" alt="Preview">
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-upload" id="analyze-btn">
+                            Analyze Look
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Loading Spinner -->
+                <div class="loading" id="loading">
+                    <div class="loading-spinner"></div>
+                    <p class="mt-3">Analyzing your style...</p>
+                </div>
+
+                <!-- Results Container -->
+                <div class="result-container" id="result-container">
+                    <h3 class="result-title">Style Analysis Result</h3>
+                    <p class="result-text">Type: <span id="result-class"></span></p>
+                    <p class="result-text">Confidence: <span id="result-confidence"></span>%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    function previewImage(input) {
+        const preview = document.getElementById('preview');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // Drag and drop functionality
+    const dropArea = document.getElementById('drop-area');
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+        dropArea.classList.add('bg-light');
+    }
+
+    function unhighlight(e) {
+        dropArea.classList.remove('bg-light');
+    }
+
+    dropArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        const fileInput = document.getElementById('file-input');
+        fileInput.files = files;
+        previewImage(fileInput);
+    }
+
+    // Form submission
+    document.getElementById('upload-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const loading = document.getElementById('loading');
+        const resultContainer = document.getElementById('result-container');
+        const analyzeBtn = document.getElementById('analyze-btn');
+
+        // Show loading spinner
+        loading.style.display = 'block';
+        resultContainer.style.display = 'none';
+        analyzeBtn.disabled = true;
+
+        fetch('{% url "main:upload" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            loading.style.display = 'none';
+            analyzeBtn.disabled = false;
+
+            if (data.success) {
+                document.getElementById('result-class').textContent = data.class;
+                document.getElementById('result-confidence').textContent = 
+                    (data.confidence * 100).toFixed(2);
+                resultContainer.style.display = 'block';
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            loading.style.display = 'none';
+            analyzeBtn.disabled = false;
+            alert('Error: ' + error);
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %} 
